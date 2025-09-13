@@ -1,0 +1,347 @@
+:root {
+  --mx: 50%;
+  --my: 50%;
+  --romantic-fade: 0;
+  --ticker-top: 65vh; /* JS will place this precisely under msg3 */
+}
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #fff;
+  overflow: hidden;
+
+  /* Primary gradient follows mouse via CSS variables */
+  background-image:
+    radial-gradient(circle at var(--mx) var(--my),
+      #ff6ec4 0%, #7873f5 60%, #1f1c2c 120%);
+  background-size: 200% 200%;
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* Romantic overlay (smooth crossfade) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at var(--mx) var(--my),
+      #ff4b8b 0%, #d6336c 55%, #8e0057 120%);
+  opacity: var(--romantic-fade);
+  transition: opacity 1.6s ease;
+  pointer-events: none;
+}
+
+/* Messages */
+h1, h2 {
+  position: absolute;
+  margin: 0;
+  opacity: 0;
+  text-align: center;
+  will-change: transform, opacity;
+}
+
+/* h1 fade in/out */
+#msg1 {
+  animation: fadeInOut 6s ease-in-out forwards;
+}
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: translateY(20px); }
+  20%  { opacity: 1; transform: translateY(0); }
+  70%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* h2 appear */
+#msg2 {
+  animation: appearAfter 6s ease-in-out forwards;
+  transition: transform 600ms cubic-bezier(.2,.7,.2,1), opacity 400ms ease;
+}
+@keyframes appearAfter {
+  0%   { opacity: 0; }
+  70%  { opacity: 0; }
+  100% { opacity: 1; }
+}
+#msg2.exit {
+  transform: translateY(-220px);
+  opacity: 0;
+}
+
+/* h3 show then exit */
+#msg3 {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 600ms ease, transform 600ms ease;
+}
+#msg3.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+#msg3.exit {
+  opacity: 0;
+  transform: translateY(-14px);
+  transition: opacity 350ms ease, transform 350ms ease;
+}
+
+/* Audio controls */
+.audio-controls {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: rgba(0,0,0,0.4);
+  padding: 6px 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  transition: opacity 300ms ease, transform 300ms ease;
+  z-index: 40;
+}
+.audio-controls button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+.audio-controls input[type="range"] {
+  width: 110px;
+  accent-color: #ff4b8b;
+  cursor: pointer;
+}
+.audio-controls.hidden {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+/* Scrolling list: centered under msg3, responsive */
+#ticker {
+  position: absolute;
+  top: var(--ticker-top);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 90ch;
+  opacity: 0;
+  transition: opacity 500ms ease;
+  pointer-events: none;
+  text-align: center;
+}
+#ticker.show { opacity: 1; }
+
+.ticker-track {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  font-family: inherit;
+  font-size: clamp(20px, 3vw, 32px);
+  line-height: 1.6;
+  will-change: transform;
+}
+
+/* Swirly randomized gradient text */
+.ticker-item {
+  background: conic-gradient(
+    from 0deg,
+    #000,
+    #fff,
+    #000,
+    #fff,
+    #000
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: swirlShift 8s infinite linear;
+  opacity: 0.95;
+}
+
+/* Animate the gradient’s rotation and shift */
+@keyframes swirlShift {
+  0%   { background-position: 0% 0%; transform: rotate(0deg); }
+  25%  { background-position: 100% 50%; transform: rotate(5deg); }
+  50%  { background-position: 50% 100%; transform: rotate(-5deg); }
+  75%  { background-position: 0% 50%; transform: rotate(3deg); }
+  100% { background-position: 100% 0%; transform: rotate(0deg); }
+}
+
+/* Final handwritten birthday message */
+#final-message {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  transition: opacity 800ms ease, transform 800ms ease;
+  z-index: 30;
+}
+#final-message.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+#final-message .msg-inner {
+  text-align: center;
+  max-width: min(92vw, 900px);
+  padding: 12px 18px;
+  font-family: "Caveat", cursive;
+  line-height: 1.2;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+}
+#final-message .line1 { font-size: clamp(40px, 8vw, 96px); font-weight: 700; }
+#final-message .line2 { font-size: clamp(24px, 4.5vw, 44px); margin-top: 6px; }
+#final-message .line3 { font-size: clamp(24px, 4.5vw, 44px); margin-top: 2px; }
+#final-message .line4 { font-size: clamp(22px, 4vw, 36px); margin-top: 10px; opacity: 0.9; }
+
+/* -------- SCENE 2 (DUO): Center message with two side images -------- */
+#scene2 {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr min(680px, 70vw) 1fr;
+  align-items: center;
+  gap: clamp(16px, 4vw, 40px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms ease;
+  z-index: 20; /* below final message while it fades */
+}
+#scene2.show { opacity: 1; pointer-events: auto; }
+
+.center-note.duo {
+  grid-column: 2;
+  text-align: center;
+  background: rgba(0,0,0,0.28);
+  padding: clamp(16px, 3vw, 28px);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+}
+.center-note.duo h2 {
+  font-family: "Caveat", cursive;
+  font-size: clamp(36px, 7vw, 72px);
+  margin: 0 0 6px 0;
+}
+.center-note.duo p {
+  margin: 0;
+  font-size: clamp(16px, 2.6vw, 22px);
+  opacity: 0.95;
+}
+
+/* side images (show full image, no cropping) */
+.side-img {
+  width: clamp(140px, 22vw, 280px); /* tweak this to make duo images smaller/larger */
+  height: auto;                     /* keep natural aspect ratio */
+  object-fit: contain;              /* never crop */
+  border-radius: 14px;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+  justify-self: center;
+  transform-origin: center;
+  animation: floaty var(--dur, 6s) ease-in-out infinite alternate;
+  opacity: 0.98;
+}
+#side-left  { grid-column: 1; --dur: 6.5s; transform: rotate(-3deg); }
+#side-right { grid-column: 3; --dur: 7.2s; transform: rotate(3deg); }
+
+/* gentle floating */
+@keyframes floaty {
+  from { transform: translateY(0) rotate(var(--rot, 0deg)); }
+  to   { transform: translateY(-10px) rotate(calc(var(--rot, 0deg) + var(--tilt, 2deg))); }
+}
+
+/* -------- SCENE 3: Typewriter + floaters -------- */
+#scene3 {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms ease;
+  z-index: 25;
+}
+#scene3.show { opacity: 1; pointer-events: auto; }
+
+/* Typewriter box (center) */
+.typewriter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(780px, 90vw);
+  background: rgba(0,0,0,0.28);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+  padding: clamp(16px, 3vw, 28px);
+  font-family: "Caveat", cursive;
+  font-size: clamp(22px, 4vw, 40px);
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* caret effect */
+.typewriter.typing::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 6px;
+  background: #fff;
+  animation: blink 1s steps(1) infinite;
+  vertical-align: -0.2em;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Floaters layer */
+#floaters {
+  position: fixed;
+  inset: 0;
+  z-index: -1; /* behind typewriter while typing */
+  pointer-events: none;
+}
+.floater {
+  position: fixed;
+  object-fit: contain; /* show full image; no cropping */
+  border-radius: 12px;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+  opacity: 0; /* start hidden; fade in via enter anim */
+  transform-origin: center;
+  will-change: transform, opacity;
+  animation: floaterEnter 800ms ease forwards;
+}
+@keyframes floaterEnter {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+/* Keep opacity at 1 when the second animation starts */
+.floater.float {
+  opacity: 1;
+  animation: floatUpDown var(--dur, 7s) ease-in-out infinite alternate;
+}
+@keyframes floatUpDown {
+  from { transform: translateY(0) rotate(var(--rot, 0deg)); }
+  to   { transform: translateY(-12px) rotate(calc(var(--rot, 0deg) + var(--tilt, 2.5deg))); }
+}
+
+/* Motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  body::before { transition: none; }
+  .audio-controls { transition: none; }
+  #ticker { transition: none; }
+  .ticker-item { animation: none; }
+  #final-message { transition: none; }
+  #scene2 { transition: none; }
+  .side-img { animation: none; }
+  #scene3 { transition: none; }
+  .floater { animation: none; opacity: 1; } /* ensure visible with reduced motion */
+}
