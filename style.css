@@ -2,7 +2,7 @@
   --mx: 50%;
   --my: 50%;
   --romantic-fade: 0;
-  --ticker-top: 65vh; /* JS will place this precisely under msg3 */
+  --ticker-top: 65vh; 
 }
 
 html, body { height: 100%; }
@@ -16,7 +16,6 @@ body {
   color: #fff;
   overflow: hidden;
 
-  /* Primary gradient follows mouse via CSS variables */
   background-image:
     radial-gradient(circle at var(--mx) var(--my),
       #ff6ec4 0%, #7873f5 60%, #1f1c2c 120%);
@@ -25,7 +24,6 @@ body {
   position: relative;
 }
 
-/* Romantic overlay (smooth crossfade) */
 body::before {
   content: "";
   position: fixed;
@@ -38,7 +36,6 @@ body::before {
   pointer-events: none;
 }
 
-/* Messages */
 h1, h2 {
   position: absolute;
   margin: 0;
@@ -47,7 +44,6 @@ h1, h2 {
   will-change: transform, opacity;
 }
 
-/* h1 fade in/out */
 #msg1 {
   animation: fadeInOut 6s ease-in-out forwards;
 }
@@ -58,7 +54,6 @@ h1, h2 {
   100% { opacity: 0; transform: translateY(-20px); }
 }
 
-/* h2 appear */
 #msg2 {
   animation: appearAfter 6s ease-in-out forwards;
   transition: transform 600ms cubic-bezier(.2,.7,.2,1), opacity 400ms ease;
@@ -73,7 +68,6 @@ h1, h2 {
   opacity: 0;
 }
 
-/* h3 show then exit */
 #msg3 {
   opacity: 0;
   transform: translateY(10px);
@@ -89,7 +83,6 @@ h1, h2 {
   transition: opacity 350ms ease, transform 350ms ease;
 }
 
-/* Audio controls */
 .audio-controls {
   position: fixed;
   bottom: 15px;
@@ -122,7 +115,6 @@ h1, h2 {
   pointer-events: none;
 }
 
-/* Scrolling list: centered under msg3, responsive */
 #ticker {
   position: absolute;
   top: var(--ticker-top);
@@ -149,7 +141,6 @@ h1, h2 {
   will-change: transform;
 }
 
-/* Swirly randomized gradient text */
 .ticker-item {
   background: conic-gradient(
     from 0deg,
@@ -166,7 +157,6 @@ h1, h2 {
   opacity: 0.95;
 }
 
-/* Animate the gradient’s rotation and shift */
 @keyframes swirlShift {
   0%   { background-position: 0% 0%; transform: rotate(0deg); }
   25%  { background-position: 100% 50%; transform: rotate(5deg); }
@@ -175,7 +165,6 @@ h1, h2 {
   100% { background-position: 100% 0%; transform: rotate(0deg); }
 }
 
-/* Final handwritten birthday message */
 #final-message {
   position: absolute;
   inset: 0;
@@ -204,7 +193,6 @@ h1, h2 {
 #final-message .line3 { font-size: clamp(24px, 4.5vw, 44px); margin-top: 2px; }
 #final-message .line4 { font-size: clamp(22px, 4vw, 36px); margin-top: 10px; opacity: 0.9; }
 
-/* -------- SCENE 2 (DUO): Center message with two side images -------- */
 #scene2 {
   position: fixed;
   inset: 0;
@@ -215,7 +203,7 @@ h1, h2 {
   opacity: 0;
   pointer-events: none;
   transition: opacity 700ms ease;
-  z-index: 20; /* below final message while it fades */
+  z-index: 20; 
 }
 #scene2.show { opacity: 1; pointer-events: auto; }
 
@@ -239,11 +227,10 @@ h1, h2 {
   opacity: 0.95;
 }
 
-/* side images (show full image, no cropping) */
 .side-img {
-  width: clamp(140px, 22vw, 280px); /* tweak this to make duo images smaller/larger */
-  height: auto;                     /* keep natural aspect ratio */
-  object-fit: contain;              /* never crop */
+  width: clamp(140px, 22vw, 280px); 
+  height: auto;                     
+  object-fit: contain;              
   border-radius: 14px;
   box-shadow: 0 14px 36px rgba(0,0,0,0.35);
   justify-self: center;
@@ -254,13 +241,11 @@ h1, h2 {
 #side-left  { grid-column: 1; --dur: 6.5s; transform: rotate(-3deg); }
 #side-right { grid-column: 3; --dur: 7.2s; transform: rotate(3deg); }
 
-/* gentle floating */
 @keyframes floaty {
   from { transform: translateY(0) rotate(var(--rot, 0deg)); }
   to   { transform: translateY(-10px) rotate(calc(var(--rot, 0deg) + var(--tilt, 2deg))); }
 }
 
-/* -------- SCENE 3: Typewriter + floaters -------- */
 #scene3 {
   position: fixed;
   inset: 0;
@@ -271,7 +256,6 @@ h1, h2 {
 }
 #scene3.show { opacity: 1; pointer-events: auto; }
 
-/* Typewriter box (center) */
 .typewriter {
   position: absolute;
   top: 50%;
@@ -289,7 +273,6 @@ h1, h2 {
   text-align: center;
 }
 
-/* caret effect */
 .typewriter.typing::after {
   content: "";
   display: inline-block;
@@ -302,19 +285,18 @@ h1, h2 {
 }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* Floaters layer */
 #floaters {
   position: fixed;
   inset: 0;
-  z-index: -1; /* behind typewriter while typing */
+  z-index: -1; 
   pointer-events: none;
 }
 .floater {
   position: fixed;
-  object-fit: contain; /* show full image; no cropping */
+  object-fit: contain; 
   border-radius: 12px;
   box-shadow: 0 14px 36px rgba(0,0,0,0.35);
-  opacity: 0; /* start hidden; fade in via enter anim */
+  opacity: 0; 
   transform-origin: center;
   will-change: transform, opacity;
   animation: floaterEnter 800ms ease forwards;
@@ -323,7 +305,7 @@ h1, h2 {
   from { opacity: 0; transform: translateY(8px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0)   scale(1); }
 }
-/* Keep opacity at 1 when the second animation starts */
+
 .floater.float {
   opacity: 1;
   animation: floatUpDown var(--dur, 7s) ease-in-out infinite alternate;
@@ -333,7 +315,6 @@ h1, h2 {
   to   { transform: translateY(-12px) rotate(calc(var(--rot, 0deg) + var(--tilt, 2.5deg))); }
 }
 
-/* Motion accessibility */
 @media (prefers-reduced-motion: reduce) {
   body::before { transition: none; }
   .audio-controls { transition: none; }
@@ -343,5 +324,6 @@ h1, h2 {
   #scene2 { transition: none; }
   .side-img { animation: none; }
   #scene3 { transition: none; }
-  .floater { animation: none; opacity: 1; } /* ensure visible with reduced motion */
+  .floater { animation: none; opacity: 1; }
 }
+
