@@ -1,4 +1,3 @@
-/* ---------- Smooth gradient follow ---------- */
 const root = document.documentElement;
 let targetX = 50, targetY = 50;
 let currentX = 50, currentY = 50;
@@ -16,7 +15,6 @@ document.addEventListener("mousemove", (e) => {
   requestAnimationFrame(raf);
 })();
 
-/* ---------- Messages & gradient transition ---------- */
 const msg2 = document.getElementById("msg2");
 const msg3 = document.getElementById("msg3");
 
@@ -70,7 +68,6 @@ window.addEventListener("resize", () => {
   }
 });
 
-/* ---------- Audio controls ---------- */
 muteBtn.addEventListener("click", () => {
   music.muted = !music.muted;
   muteBtn.textContent = music.muted ? "🔇" : "🔊";
@@ -89,7 +86,6 @@ volumeSlider.addEventListener("input", (e) => {
   music.volume = e.target.value;
 });
 
-/* ---------- Auto-hide controls ---------- */
 let hideTimer = null;
 const HIDE_DELAY = 2500;
 
@@ -113,12 +109,10 @@ function armControlsAutohide() {
   window.addEventListener("mousemove", onMove);
 }
 
-/* ---------- Scrolling list ---------- */
 const ticker = document.getElementById("ticker");
 const track  = document.getElementById("ticker-track");
 const finalMsg = document.getElementById("final-message");
 
-/* Your custom items */
 const items = [
   "– buldak (even if you dont like it anymore)",
   "– cars, especially fast and furious",
@@ -158,11 +152,6 @@ function buildTicker() {
 }
 
 /**
- * Start the scrolling list exactly from just under where msg3 was.
- * It scrolls upward through the whole viewport and naturally disappears
- * once it leaves the top of the page, then waits for ONE click to reveal
- * the handwritten birthday message, then another click to show Scene 2 (duo).
- *
  * @param {number} topPx  The pixel Y-position where the ticker begins (from viewport top)
  */
 function startTicker(topPx) {
@@ -171,15 +160,13 @@ function startTicker(topPx) {
 
   let y = 0;
 
-  // Measure total content height (all items + gaps)
   const lines = Array.from(track.children);
   const computed = getComputedStyle(track);
   const gap = parseFloat(computed.gap) || 18; // matches CSS gap
   const totalHeight = lines.reduce((sum, el) => sum + el.offsetHeight, 0) + gap * (lines.length - 1);
 
-  // Progressive speed-up
-  let speed = 22;    // px/s initial
-  const accel = 1;   // px/s^2
+  let speed = 22;    
+  const accel = 1;   
   const maxSpeed = 175;
 
   let prevTs = performance.now();
@@ -193,7 +180,6 @@ function startTicker(topPx) {
 
     track.style.transform = `translateY(${y}px)`;
 
-    // When the list's bottom is above the viewport top, stop & prepare final message
     if (topPx + y + totalHeight > -20) {
       requestAnimationFrame(tick);
     } else {
@@ -212,13 +198,12 @@ function revealFinalMessage() {
     finalMsg.classList.remove("show");
     setTimeout(() => {
       startScene2Duo();
-    }, 820); // matches CSS 800ms + a little buffer
+    }, 820); 
   };
 
   document.addEventListener("click", proceed, { once: true });
 }
 
-/* ---------- SCENE 2 (DUO): center message with two side images ---------- */
 const scene2 = document.getElementById("scene2");
 const sideLeft = document.getElementById("side-left");
 const sideRight = document.getElementById("side-right");
@@ -239,26 +224,21 @@ function startScene2Duo() {
 
   scene2.classList.add("show");
 
-  // proceed to Scene 3 on next click
   document.addEventListener("click", proceedToScene3, { once: true });
 }
 
-/* ---------- SCENE 3: Typewriter + floating images ---------- */
 const scene3 = document.getElementById("scene3");
 const typewriterEl = document.getElementById("typewriter");
 const floatersEl   = document.getElementById("floaters");
 
-/* Typewriter lines */
 const typeLines = [
   "hey chud, thought i would show you some things you might like!",
   "now its not everything, but i hope it gets a smile goin.",
   "HERE WE FRICKIN GOOOOOO!!!"
 ];
 
-/* Scale factor for ALL floater images (no cropping, keeps aspect) */
-const FLOATER_SCALE = 0.4; // ← adjust this (e.g., 0.4 = 40% of original)
+const FLOATER_SCALE = 0.4; 
 
-/* Your images with commented natural dimensions */
 const floatImages = [
   { src: "media/buldakafter.png",    w: 220, h: 220 }, // 220x220
   { src: "media/tbellafter.png",     w: 666, h: 375 }, // 666x375
@@ -328,13 +308,11 @@ function spawnFloaters() {
     img.src = imgInfo.src;
     img.alt = `memory ${idx + 1}`;
 
-    // Apply global scale (preserve aspect; no cropping)
     const wScaled = Math.max(1, Math.round(imgInfo.w * FLOATER_SCALE));
     const hScaled = Math.max(1, Math.round(imgInfo.h * FLOATER_SCALE));
     img.style.width  = wScaled + "px";
     img.style.height = hScaled + "px";
 
-    // random rotation/tilt and speed
     const rot  = (Math.random() * 14 - 7).toFixed(2) + "deg";
     const tilt = (Math.random() * 6 + 2).toFixed(2) + "deg";
     const dur  = (Math.random() * 3 + 6).toFixed(2) + "s";
@@ -342,14 +320,12 @@ function spawnFloaters() {
     img.style.setProperty("--tilt", tilt);
     img.style.setProperty("--dur", dur);
 
-    // avoid the typewriter box
     const { x, y } = findPositionAwayFromBox(wScaled, hScaled, noteBox, margin);
     img.style.left = x + "px";
     img.style.top  = y + "px";
 
     floatersEl.appendChild(img);
 
-    // after the enter animation completes, start the float
     setTimeout(() => img.classList.add("float"), 820);
   });
 }
@@ -368,10 +344,11 @@ function findPositionAwayFromBox(w, h, box, margin = 24) {
 
     if (!overlaps) return { x, y };
   }
-  // fallback along edges if it's too crowded
+  
   const edge = Math.random();
   if (edge < 0.25) return { x: 12, y: 12 };
   if (edge < 0.50) return { x: window.innerWidth - w - 12, y: 12 };
   if (edge < 0.75) return { x: 12, y: window.innerHeight - h - 12 };
   return { x: window.innerWidth - w - 12, y: window.innerHeight - h - 12 };
 }
+
