@@ -5,23 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HAPPY BIRTHDAY CHUD</title>
 
-  <!-- Handwritten font for the final birthday message -->
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Messages -->
   <h1 id="msg1">Hello you fat smelly chud :)</h1>
   <h2 id="msg2">i hope you enjoy. click after each scene to move forward. (MUSIC WARNING)</h2>
   <h2 id="msg3">this song always reminded me of you. here are some other things:</h2>
 
-  <!-- Scrolling list (hidden until after msg3 disappears) -->
   <div id="ticker" aria-hidden="true">
     <div class="ticker-track" id="ticker-track"></div>
   </div>
 
-  <!-- Final birthday message (appears AFTER the list finishes and you click once) -->
   <div id="final-message" aria-live="polite">
     <div class="msg-inner">
       <div class="line1">happy birthday bubu. i wish you the best every day moving forward.</div>
@@ -31,7 +27,6 @@
     </div>
   </div>
 
-  <!-- SCENE 2 (DUO): Center message with images on both sides -->
   <section id="scene2" aria-hidden="true">
     <img id="side-left" class="side-img" alt="left memory">
     <div class="center-note duo">
@@ -45,16 +40,13 @@
     <img id="side-right" class="side-img" alt="right memory">
   </section>
 
-  <!-- SCENE 3: Typewriter center message, then floating images -->
   <section id="scene3" aria-hidden="true">
     <div id="typewriter" class="typewriter" aria-live="polite"></div>
     <div id="floaters" aria-hidden="true"></div>
   </section>
 
-  <!-- Background music -->
   <audio id="bg-music" src="media/favorite-med.mp3" preload="auto"></audio>
 
-  <!-- Minimal audio controls (auto-hiding) -->
   <div class="audio-controls" id="audio-controls" role="group" aria-label="Audio controls">
     <button id="play-btn" aria-label="Play or pause">▶️</button>
     <button id="mute-btn" aria-label="Mute or unmute">🔊</button>
@@ -64,4 +56,5 @@
   <script src="script.js"></script>
 </body>
 </html>
+
 
