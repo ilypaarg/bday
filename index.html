@@ -1,60 +1,55 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HAPPY BIRTHDAY CHUD</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2.14.26</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1 id="msg1">Hello you fat smelly chud :)</h1>
-  <h2 id="msg2">i hope you enjoy. click after each scene to move forward. (MUSIC WARNING)</h2>
-  <h2 id="msg3">this song always reminded me of you. here are some other things:</h2>
+  <div class="bg" aria-hidden="true"></div>
 
-  <div id="ticker" aria-hidden="true">
-    <div class="ticker-track" id="ticker-track"></div>
-  </div>
+  <div class="scene" id="scene1">
+    <h1 class="date">2.14.26</h1>
 
-  <div id="final-message" aria-live="polite">
-    <div class="msg-inner">
-      <div class="line1">happy birthday bubu. i wish you the best every day moving forward.</div>
-      <div class="line2">had i not known you, my life would be nowhere near as beautiful as it is now.</div>
-      <div class="line3">thank you for everything, and never stop being who you are.</div>
-      <div class="line4">— from fat emshart (dudu if you will), always and every year. 💗</div>
+    <div class="enterUI">
+      <div class="question">would you like to enter?</div>
+
+      <div class="choices" id="choices">
+        <button class="choice yes" id="yesBtn" type="button">yes</button>
+        <button class="choice no" id="noBtn" type="button">no</button>
+      </div>
     </div>
   </div>
 
-  <section id="scene2" aria-hidden="true">
-    <img id="side-left" class="side-img" alt="left memory">
-    <div class="center-note duo">
-      <h2>from one chud to another.</h2>
-      <p>
-        we're the best people there is out there. we're both fat as fuck but that's okay.<br/>
-        there's nobody i'd rather call fat and be fat with than you chud.<br/>
-        one day, when we hit up elm street diner (if i dont get deported), we'll prove it. 🤗
-      </p>
-    </div>
-    <img id="side-right" class="side-img" alt="right memory">
-  </section>
-
-  <section id="scene3" aria-hidden="true">
-    <div id="typewriter" class="typewriter" aria-live="polite"></div>
-    <div id="floaters" aria-hidden="true"></div>
-  </section>
-
-  <audio id="bg-music" src="media/favorite-med.mp3" preload="auto"></audio>
-
-  <div class="audio-controls" id="audio-controls" role="group" aria-label="Audio controls">
-    <button id="play-btn" aria-label="Play or pause">▶️</button>
-    <button id="mute-btn" aria-label="Mute or unmute">🔊</button>
-    <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="Volume">
+  <div class="scene hidden" id="scene2">
+    <div class="nextText">big mistake, pal.</div>
   </div>
+
+  <div class="scene hidden" id="scene3">
+    <div class="noteArea">
+      <button class="replayBtn" id="replayBtn" type="button">replay</button>
+
+      <div class="noteWrap" id="noteWrap">
+        <div class="noteTitle">the way i feel today, and every day.</div>
+        <div class="note" id="note"></div>
+        <div class="noteHint" id="noteHint">click to continue</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="audioUI" aria-label="Audio controls">
+    <button class="audioBtn" id="musicBtn" type="button" aria-pressed="true">Music: On</button>
+    <div class="sliderWrap">
+      <input id="volume" class="slider" type="range" min="0" max="100" value="70" />
+      <span class="volText" id="volText">70%</span>
+    </div>
+  </div>
+
+  <audio id="audio" preload="auto" loop>
+    <source src="media/holli.mp3" type="audio/mpeg" />
+  </audio>
 
   <script src="script.js"></script>
 </body>
 </html>
-
-
