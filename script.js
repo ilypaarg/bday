@@ -1,354 +1,352 @@
 const root = document.documentElement;
-let targetX = 50, targetY = 50;
-let currentX = 50, currentY = 50;
 
-document.addEventListener("mousemove", (e) => {
-  targetX = (e.clientX / window.innerWidth) * 100;
-  targetY = (e.clientY / window.innerHeight) * 100;
-});
-(function raf() {
-  const ease = 0.08;
-  currentX += (targetX - currentX) * ease;
-  currentY += (targetY - currentY) * ease;
-  root.style.setProperty("--mx", currentX + "%");
-  root.style.setProperty("--my", currentY + "%");
-  requestAnimationFrame(raf);
-})();
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
 
-const msg2 = document.getElementById("msg2");
-const msg3 = document.getElementById("msg3");
+let tx = 0.5, ty = 0.3;
+let mx = tx, my = ty;
 
-const music = document.getElementById("bg-music");
-const audioControls = document.getElementById("audio-controls");
-const muteBtn = document.getElementById("mute-btn");
-const playBtn = document.getElementById("play-btn");
-const volumeSlider = document.getElementById("volume-slider");
-
-let tickerTopPx = null;
-
-msg2.addEventListener("animationend", () => {
-  document.addEventListener("click", onFirstClick, { once: true });
-});
-
-function onFirstClick() {
-  root.style.setProperty("--romantic-fade", "1");
-  music.volume = parseFloat(volumeSlider.value);
-  music.play().then(() => { playBtn.textContent = "⏸️"; }).catch(() => {});
-
-  msg2.classList.add("exit");
-  msg2.addEventListener("transitionend", () => {
-    msg2.remove();
-    msg3.classList.add("show");
-    document.addEventListener("click", onSecondClick, { once: true });
-  }, { once: true });
-
-  armControlsAutohide();
+function setPos(clientX, clientY) {
+  const w = window.innerWidth || 1;
+  const h = window.innerHeight || 1;
+  tx = clamp(clientX / w, 0, 1);
+  ty = clamp(clientY / h, 0, 1);
 }
 
-function onSecondClick() {
-  tickerTopPx = positionTickerUnderMsg3();
-  msg3.classList.add("exit");
-  msg3.addEventListener("transitionend", () => {
-    msg3.remove();
-    startTicker(tickerTopPx);
-  }, { once: true });
-}
+window.addEventListener("mousemove", (e) => setPos(e.clientX, e.clientY), { passive: true });
+window.addEventListener("touchmove", (e) => {
+  const t = e.touches && e.touches[0];
+  if (!t) return;
+  setPos(t.clientX, t.clientY);
+}, { passive: true });
 
-function positionTickerUnderMsg3(offset = 18) {
-  const r = msg3.getBoundingClientRect();
-  const topPx = r.bottom + offset;
-  const topVh = (topPx / window.innerHeight) * 100;
-  root.style.setProperty("--ticker-top", `${topVh}vh`);
-  return topPx;
-}
+let last = performance.now();
+let phase = 0;
 
-window.addEventListener("resize", () => {
-  if (document.body.contains(msg3) && msg3.classList.contains("show")) {
-    tickerTopPx = positionTickerUnderMsg3();
-  }
-});
+function tick(now) {
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
 
-muteBtn.addEventListener("click", () => {
-  music.muted = !music.muted;
-  muteBtn.textContent = music.muted ? "🔇" : "🔊";
-});
+  const follow = 1 - Math.pow(0.00008, dt);
+  mx += (tx - mx) * follow;
+  my += (ty - my) * follow;
 
-playBtn.addEventListener("click", () => {
-  if (music.paused) {
-    music.play().then(() => { playBtn.textContent = "⏸️"; }).catch(() => {});
-  } else {
-    music.pause();
-    playBtn.textContent = "▶️";
-  }
-});
+  const wobble = 0.012;
+  const px = mx + Math.sin(now * 0.0022) * wobble;
+  const py = my + Math.cos(now * 0.0019) * wobble;
 
-volumeSlider.addEventListener("input", (e) => {
-  music.volume = e.target.value;
-});
+  root.style.setProperty("--mx", (px * 100).toFixed(3) + "vw");
+  root.style.setProperty("--my", (py * 100).toFixed(3) + "vh");
 
-let hideTimer = null;
-const HIDE_DELAY = 2500;
-
-function showControls() { audioControls.classList.remove("hidden"); }
-function hideControls() { audioControls.classList.add("hidden"); }
-
-function armControlsAutohide() {
-  const hotArea = (x, y) => x < 220 && y > window.innerHeight - 160;
-
-  const onMove = (e) => {
-    if (hotArea(e.clientX, e.clientY)) {
-      showControls();
-      if (hideTimer) clearTimeout(hideTimer);
-      hideTimer = setTimeout(hideControls, HIDE_DELAY);
-    }
-  };
-
-  if (hideTimer) clearTimeout(hideTimer);
-  hideTimer = setTimeout(hideControls, HIDE_DELAY);
-
-  window.addEventListener("mousemove", onMove);
-}
-
-const ticker = document.getElementById("ticker");
-const track  = document.getElementById("ticker-track");
-const finalMsg = document.getElementById("final-message");
-
-const items = [
-  "– buldak (even if you dont like it anymore)",
-  "– cars, especially fast and furious",
-  "– legos!!",
-  "– owls for suresies",
-  "– overwatch (by the time you see this ill be unbanned)",
-  "– cats MEEOOWWW",
-  "– RAISIN CANES BABYYYYY",
-  "– lola cause we been twinning before we even knew each other",
-  "– valorant (YUCK! but its not yuck when it reminds me of you)",
-  "– eating cause we're both huge",
-  "– sleeping cause we love doing that (you especially)",
-  "– headaches :( everytime i get one i think of you",
-  "– asthma also cause we're twinning",
-  "– pennsylvania in general",
-  "– taco bell (t-beazy) man its so good",
-  "– ice cream like cookie vermonster cake bomb elimination",
-  "– crumbl (i hope your cookies are good this week)",
-  "– anything funny because to me, i hear a joke and know you can say it better",
-  "– anything heart shaped, i always feel like i need to show you",
-  "– PINK IN GENERAL BRO ITS JUST YOU",
-  "– 2hollis, my goodness you surely put me on even though i slightly knew him before",
-  "– anything fun at all because ive had the most fun with you",
-  "– PA license plates",
-  "– south park",
-  "– labubus"
-];
-
-function buildTicker() {
-  track.innerHTML = "";
-  items.forEach(text => {
-    const div = document.createElement("div");
-    div.className = "ticker-item";
-    div.textContent = text;
-    track.appendChild(div);
-  });
-}
-
-/**
- * @param {number} topPx  The pixel Y-position where the ticker begins (from viewport top)
- */
-function startTicker(topPx) {
-  buildTicker();
-  ticker.classList.add("show");
-
-  let y = 0;
-
-  const lines = Array.from(track.children);
-  const computed = getComputedStyle(track);
-  const gap = parseFloat(computed.gap) || 18; // matches CSS gap
-  const totalHeight = lines.reduce((sum, el) => sum + el.offsetHeight, 0) + gap * (lines.length - 1);
-
-  let speed = 22;    
-  const accel = 1;   
-  const maxSpeed = 175;
-
-  let prevTs = performance.now();
-
-  function tick(ts) {
-    const dt = (ts - prevTs) / 1000;
-    prevTs = ts;
-
-    speed = Math.min(maxSpeed, speed + accel * dt);
-    y -= speed * dt;
-
-    track.style.transform = `translateY(${y}px)`;
-
-    if (topPx + y + totalHeight > -20) {
-      requestAnimationFrame(tick);
-    } else {
-      ticker.remove();
-      document.addEventListener("click", revealFinalMessage, { once: true });
-    }
-  }
+  phase += dt * 2.2;
+  root.style.setProperty("--t", String(phase));
 
   requestAnimationFrame(tick);
 }
 
-function revealFinalMessage() {
-  finalMsg.classList.add("show");
+requestAnimationFrame(tick);
 
-  const proceed = () => {
-    finalMsg.classList.remove("show");
-    setTimeout(() => {
-      startScene2Duo();
-    }, 820); 
-  };
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const choices = document.getElementById("choices");
 
-  document.addEventListener("click", proceed, { once: true });
-}
-
+const scene1 = document.getElementById("scene1");
 const scene2 = document.getElementById("scene2");
-const sideLeft = document.getElementById("side-left");
-const sideRight = document.getElementById("side-right");
-
-const duoSources = [
-  "media/obesemory.jpg",
-  "media/obesela.png"
-];
-
-function startScene2Duo() {
-  sideLeft.src = duoSources[0];
-  sideRight.src = duoSources[1];
-
-  sideLeft.style.setProperty("--rot", "-2deg");
-  sideLeft.style.setProperty("--tilt", "2deg");
-  sideRight.style.setProperty("--rot", "2deg");
-  sideRight.style.setProperty("--tilt", "2.5deg");
-
-  scene2.classList.add("show");
-
-  document.addEventListener("click", proceedToScene3, { once: true });
-}
-
 const scene3 = document.getElementById("scene3");
-const typewriterEl = document.getElementById("typewriter");
-const floatersEl   = document.getElementById("floaters");
 
-const typeLines = [
-  "hey chud, thought i would show you some things you might like!",
-  "now its not everything, but i hope it gets a smile goin.",
-  "HERE WE FRICKIN GOOOOOO!!!"
-];
+let yesScale = 1;
+let noScale = 1;
 
-const FLOATER_SCALE = 0.4; 
+let noX = 0.65;
+let noY = 0.50;
 
-const floatImages = [
-  { src: "media/buldakafter.png",    w: 220, h: 220 }, // 220x220
-  { src: "media/tbellafter.png",     w: 666, h: 375 }, // 666x375
-  { src: "media/canesafter.png",     w: 667, h: 374 }, // 667x374
-  { src: "media/labubuafter.png",    w: 433, h: 577 }, // 433x577
-  { src: "media/chudevoafter.png",   w: 612, h: 408 }, // 612x408
-  { src: "media/ow2after.png",       w: 586, h: 426 }, // 586x426
-  { src: "media/foodbruhafter2.png", w: 441, h: 566 }, // 441x566
-  { src: "media/foodbruhafter.png",  w: 353, h: 482 }, // 353x482
-  { src: "media/fireopal.png",       w: 104, h: 105 }, // 104x105
-  { src: "media/cat.jpg",            w: 400, h: 533 }  // 400x533
-];
+let yesX = 0.35;
+let yesY = 0.50;
 
-function proceedToScene3() {
-  scene2.classList.remove("show");
-  setTimeout(() => {
-    scene3.classList.add("show");
-    startTypewriter(typeLines, { charDelay: 38, lineDelay: 550, afterDelay: 1600 });
-  }, 720);
+let cursorX = 0.50;
+let cursorY = 0.50;
+
+function applyPositions(){
+  const w = choices.clientWidth || 1;
+  const h = choices.clientHeight || 1;
+
+  yesBtn.style.left = (yesX * w) + "px";
+  yesBtn.style.top = (yesY * h) + "px";
+
+  noBtn.style.left = (noX * w) + "px";
+  noBtn.style.top = (noY * h) + "px";
 }
 
-function startTypewriter(lines, { charDelay = 40, lineDelay = 500, afterDelay = 1500 } = {}) {
-  typewriterEl.textContent = "";
-  typewriterEl.classList.add("typing");
+function nudgeScales(){
+  yesScale = clamp(yesScale + 0.12, 1, 3.0);
+  noScale = clamp(noScale - 0.08, 0.30, 1);
 
-  let lineIndex = 0;
+  yesBtn.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
+  noBtn.style.transform = `translate(-50%, -50%) scale(${noScale})`;
+}
 
-  function typeNextLine() {
-    if (lineIndex >= lines.length) {
-      typewriterEl.classList.remove("typing");
-      setTimeout(spawnFloaters, afterDelay);
+choices.addEventListener("mousemove", (e) => {
+  const r = choices.getBoundingClientRect();
+  cursorX = clamp((e.clientX - r.left) / r.width, 0, 1);
+  cursorY = clamp((e.clientY - r.top) / r.height, 0, 1);
+}, { passive: true });
+
+choices.addEventListener("touchmove", (e) => {
+  const t = e.touches && e.touches[0];
+  if (!t) return;
+  const r = choices.getBoundingClientRect();
+  cursorX = clamp((t.clientX - r.left) / r.width, 0, 1);
+  cursorY = clamp((t.clientY - r.top) / r.height, 0, 1);
+}, { passive: true });
+
+noBtn.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  nudgeScales();
+});
+
+noBtn.addEventListener("mouseenter", () => {
+  nudgeScales();
+});
+
+function showScene(a, b){
+  a.classList.add("hidden");
+  b.classList.remove("hidden");
+}
+
+const noteEl = document.getElementById("note");
+const noteWrap = document.getElementById("noteWrap");
+const noteHint = document.getElementById("noteHint");
+const replayBtn = document.getElementById("replayBtn");
+
+const noteLines = [
+  "hey chud, its fat emfart here. i didnt tell you i was making this im gonna be honest...",
+  "i figured if i did, youd get your hopes up and you know im not talented.",
+  "anywho, i wanted to make this for you because its a day i havent celebrated in a while.",
+  "maybe today i wont even celebrate it. but i want you to have at least something to smile about.",
+  "now, im not going to ask you to be my valentine since im 99% sure youd say no.",
+  "however though but though but perchance if you want to, you know where to reach me and tell me........",
+  "okay okay sorry... i know its been a rough few months for you. you tend to have these rough patches.",
+  "however, i dont think you ever had someone there for you. thats why im here now. im someone you can rely on chud.",
+  "im someone who will be willing to listen to you and be there for you through anything and everything.",
+  "im not sure exactly what it is you did to me, but you ignited some flame in my soul to pracitcally exist for you only.",
+  "i want to laugh with you, cry with you, smile with you, be stupid with you, all because you make those little things matter.",
+  "i remember long ago we said that little things matter the most. well, you show me little things every single day that just blow me away.",
+  "you might have aids now. but you know what i told you?",
+  "no matter what chud i will always see you as my shining star.",
+  "love is indigestion.",
+  "in sickness and in health lil brah.",
+  "you skyla, are the reason im happy. the reason i smile and the reason breathing fresh air feels so good.",
+  "no matter what path your life takes, in each one, im always there. proud of you, loving you, whether its close or from a distance.",
+  "you are one spectacular girl. such so that no matter the case of your feelings and your strength, you deserve to have a good valentines day.",
+  "truthfully, you deserve to have a good day every day but at least for today - february 14th, 2026, i can guarantee you have a good valentines day.",
+  "with you, ive experienced insatiable fits of happiness and joy. youve made me a better person and you genuinely make me stronger.",
+  "i know we have a big disparity in our feelings for each other, however that doesnt change mine for you.",
+  "sometimes, i feel really stupid for feeling the way i do about you but then i remember that theres no universe where id ever apologize for it.",
+  "i cant control it. and frankly, i dont want to. i am happy feeling the way i do for you.",
+  "anywhom, with that all being said, i hope you have a great valentines day you pretty pretty beautiful girl.",
+  "i cant give you flowers phsyically, so here is what i have for you now...",
+  "💐💐💐💐💐💐💐💗💗💗💗💗💗💗",
+  "EMFART, OUT!!!"
+];
+
+let lineIndex = 0;
+let typing = false;
+let awaitingClick = false;
+let timerId = null;
+
+function clearTimer(){
+  if (timerId !== null){
+    clearTimeout(timerId);
+    timerId = null;
+  }
+}
+
+function typeLine(line){
+  typing = true;
+  awaitingClick = false;
+  noteHint.textContent = "";
+  let i = 0;
+  const base = 22;
+  const jitter = 16;
+
+  function step(){
+    if (i >= line.length){
+      typing = false;
+      awaitingClick = true;
+      noteHint.textContent = lineIndex < noteLines.length - 1 ? "click to continue" : "click to finish";
       return;
     }
+    noteEl.textContent += line[i];
+    noteEl.scrollTop = noteEl.scrollHeight;
+    i++;
+    const wait = base + Math.random() * jitter + (line[i - 1] === "," ? 70 : 0);
+    timerId = setTimeout(step, wait);
+  }
 
-    const line = lines[lineIndex];
-    const lineContainer = document.createElement("div");
-    lineContainer.style.margin = lineIndex === 0 ? "0 0 4px 0" : "6px 0 0 0";
-    typewriterEl.appendChild(lineContainer);
+  step();
+}
 
-    let i = 0;
-    function tick() {
-      lineContainer.textContent = line.slice(0, i + 1);
-      i++;
-      if (i < line.length) {
-        setTimeout(tick, charDelay);
-      } else {
-        lineIndex++;
-        setTimeout(typeNextLine, lineDelay);
-      }
+function startNote(){
+  clearTimer();
+  typing = false;
+  awaitingClick = false;
+  noteEl.textContent += "\n";
+  noteEl.scrollTop = noteEl.scrollHeight;
+  lineIndex = 0;
+  typeLine(noteLines[lineIndex]);
+}
+
+function nextLine(){
+  if (typing) return;
+  if (!awaitingClick) return;
+
+  lineIndex++;
+  if (lineIndex >= noteLines.length){
+    noteHint.textContent = "done";
+    awaitingClick = false;
+    return;
+  }
+
+  noteEl.textContent += "\n";
+  typeLine(noteLines[lineIndex]);
+}
+
+function noteAdvance(){
+  if (scene3.classList.contains("hidden")) return;
+  nextLine();
+}
+
+noteWrap.addEventListener("click", noteAdvance);
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " "){
+    e.preventDefault();
+    noteAdvance();
+  }
+});
+
+replayBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  startNote();
+});
+
+let entered = false;
+
+yesBtn.addEventListener("click", () => {
+  if (entered) return;
+  entered = true;
+
+  showScene(scene1, scene2);
+
+  setTimeout(() => {
+    showScene(scene2, scene3);
+    startNote();
+  }, 2400);
+});
+
+function stepChoices(){
+  const padX = 0.16;
+  const padY = 0.24;
+
+  const chase = 0.06 + (yesScale - 1) * 0.03;
+  yesX += (cursorX - yesX) * chase;
+  yesY += (cursorY - yesY) * chase;
+
+  yesX = clamp(yesX, padX, 1 - padX);
+  yesY = clamp(yesY, padY, 1 - padY);
+
+  const dx = noX - yesX;
+  const dy = noY - yesY;
+  const d = Math.max(0.001, Math.hypot(dx, dy));
+
+  const push = (0.030 * (1.0 + (yesScale - 1) * 0.8)) / d;
+  noX += (dx / d) * push;
+  noY += (dy / d) * push;
+
+  const dcx = noX - cursorX;
+  const dcy = noY - cursorY;
+  const dc = Math.max(0.001, Math.hypot(dcx, dcy));
+  const push2 = 0.036 / dc;
+  noX += (dcx / dc) * push2;
+  noY += (dcy / dc) * push2;
+
+  noX = clamp(noX, padX, 1 - padX);
+  noY = clamp(noY, padY, 1 - padY);
+
+  const edgePull = 0.006;
+  noX += (0.5 - noX) * edgePull;
+  noY += (0.5 - noY) * edgePull;
+
+  applyPositions();
+  requestAnimationFrame(stepChoices);
+}
+
+window.addEventListener("resize", applyPositions, { passive: true });
+applyPositions();
+requestAnimationFrame(stepChoices);
+
+const audio = document.getElementById("audio");
+const musicBtn = document.getElementById("musicBtn");
+const volume = document.getElementById("volume");
+const volText = document.getElementById("volText");
+
+const savedVol = localStorage.getItem("val_vol");
+const savedOn = localStorage.getItem("val_on");
+
+let vol = savedVol !== null ? clamp(Number(savedVol) || 70, 0, 100) : 70;
+volume.value = String(vol);
+volText.textContent = `${vol}%`;
+audio.volume = vol / 100;
+
+let on = savedOn === null ? true : savedOn === "1";
+
+function syncUI(){
+  musicBtn.textContent = on ? "Music: On" : "Music: Off";
+  musicBtn.setAttribute("aria-pressed", on ? "true" : "false");
+  localStorage.setItem("val_vol", String(Math.round(audio.volume * 100)));
+  localStorage.setItem("val_on", on ? "1" : "0");
+}
+
+async function tryPlay(){
+  if (!on) return false;
+  try{
+    await audio.play();
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+function armAutoStart(){
+  const kick = async () => {
+    const ok = await tryPlay();
+    if (ok) {
+      window.removeEventListener("pointerdown", kick);
+      window.removeEventListener("keydown", kick);
+      window.removeEventListener("touchstart", kick);
     }
-    tick();
+  };
+  window.addEventListener("pointerdown", kick, { passive: true });
+  window.addEventListener("touchstart", kick, { passive: true });
+  window.addEventListener("keydown", kick);
+}
+
+volume.addEventListener("input", () => {
+  const v = clamp(Number(volume.value) || 0, 0, 100);
+  audio.volume = v / 100;
+  volText.textContent = `${v}%`;
+  localStorage.setItem("val_vol", String(v));
+});
+
+musicBtn.addEventListener("click", async () => {
+  on = !on;
+  if (on) {
+    const ok = await tryPlay();
+    if (!ok) armAutoStart();
+  } else {
+    audio.pause();
   }
+  syncUI();
+});
 
-  typeNextLine();
-}
-
-function spawnFloaters() {
-  floatersEl.innerHTML = "";
-  floatersEl.style.zIndex = "1";
-
-  const noteBox = typewriterEl.getBoundingClientRect();
-  const margin = 24;
-
-  floatImages.forEach((imgInfo, idx) => {
-    const img = document.createElement("img");
-    img.className = "floater";
-    img.src = imgInfo.src;
-    img.alt = `memory ${idx + 1}`;
-
-    const wScaled = Math.max(1, Math.round(imgInfo.w * FLOATER_SCALE));
-    const hScaled = Math.max(1, Math.round(imgInfo.h * FLOATER_SCALE));
-    img.style.width  = wScaled + "px";
-    img.style.height = hScaled + "px";
-
-    const rot  = (Math.random() * 14 - 7).toFixed(2) + "deg";
-    const tilt = (Math.random() * 6 + 2).toFixed(2) + "deg";
-    const dur  = (Math.random() * 3 + 6).toFixed(2) + "s";
-    img.style.setProperty("--rot", rot);
-    img.style.setProperty("--tilt", tilt);
-    img.style.setProperty("--dur", dur);
-
-    const { x, y } = findPositionAwayFromBox(wScaled, hScaled, noteBox, margin);
-    img.style.left = x + "px";
-    img.style.top  = y + "px";
-
-    floatersEl.appendChild(img);
-
-    setTimeout(() => img.classList.add("float"), 820);
-  });
-}
-
-function findPositionAwayFromBox(w, h, box, margin = 24) {
-  const maxAttempts = 80;
-  for (let i = 0; i < maxAttempts; i++) {
-    const x = Math.floor(Math.random() * Math.max(1, window.innerWidth - w));
-    const y = Math.floor(Math.random() * Math.max(1, window.innerHeight - h));
-
-    const overlaps =
-      x < (box.right + margin) &&
-      (x + w) > (box.left - margin) &&
-      y < (box.bottom + margin) &&
-      (y + h) > (box.top - margin);
-
-    if (!overlaps) return { x, y };
-  }
-  
-  const edge = Math.random();
-  if (edge < 0.25) return { x: 12, y: 12 };
-  if (edge < 0.50) return { x: window.innerWidth - w - 12, y: 12 };
-  if (edge < 0.75) return { x: 12, y: window.innerHeight - h - 12 };
-  return { x: window.innerWidth - w - 12, y: window.innerHeight - h - 12 };
-}
-
+syncUI();
+tryPlay().then(ok => { if (!ok) armAutoStart(); });
